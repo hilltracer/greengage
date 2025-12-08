@@ -39,22 +39,22 @@ operating systems:
 
 ## Release Workflow
 
-A separate workflow, `Greengage release`, handles the creation and update of GitHub releases. It is triggered when a release is created or edited and uses a composite action to upload Debian packages to the release.
+A separate workflow, `Greengage release`, handles the uploading of Debian packages to GitHub releases. It is triggered when a release is published or edited and uses a composite action to manage package deployment.
 
 ### Key Features
 
-- **Triggers:** `release: [created, edited]` - Runs when a release is created or updated.
+- **Triggers:** `release: [published, edited]` - Runs when a release is published (including re-publishing) or when an existing release is edited.
 - **Concurrency:** Uses the same concurrency group as the CI workflow (`Greengage CI-${{ github.ref }}`) to ensure proper sequencing and prevent race conditions.
-- **Cache-based Artifacts:** Instead of downloading artifacts from previous jobs, it restores built packages from a cache using the commit SHA as the key.
-- **Auto-recovery:** If the cache is missing, the workflow checks the status of the last build for the tag and provides clear instructions for manual intervention. It does not automatically trigger builds to avoid infinite loops.
+- **Cache-based Artifacts:** Restores built packages from cache using the commit SHA as the key, rather than downloading artifacts from previous jobs.
+- **Manual Recovery:** If the cache is missing, the workflow checks the status of the last build for the tag and provides clear instructions for manual intervention. It does not automatically trigger builds to avoid infinite loops.
 - **Safe Uploads:** Uploads packages with fixed naming patterns and optional overwrite (`clobber` flag).
 
 ### Behavior
 
 1. **Normal Flow (Cache Available):** Restores packages from cache, renames them to the pattern `${PACKAGE_NAME}${VERSION}.${EXT}`, and uploads to the release.
 2. **Cache Miss Scenarios:**
-   - **No previous build or previous build successful:** Instructs the user to manually trigger the CI build and then restart the release workflow.
-   - **Previous build failed:** Reports the failure and requires manual fixing before retrying.
+   - **No previous build or previous build successful:** Provides instructions to manually trigger the CI build, then restart the release workflow.
+   - **Previous build failed:** Reports the failure with a link to the failed run and requires manual fixing before retrying.
 
 The release workflow is designed to be robust and provide clear feedback when issues occur, ensuring that releases are always consistent and reliable.
 
