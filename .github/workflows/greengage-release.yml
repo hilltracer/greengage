@@ -30,6 +30,8 @@ jobs:
           extensions: deb ddeb
           artifact_name: deb-packages
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Upload packages to release
         uses: greengagedb/greengage-ci/.github/actions/upload-pkgs-to-release@v10
